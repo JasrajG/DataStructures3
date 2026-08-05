@@ -44,7 +44,25 @@ public class BSTUtilities<E> {
 	 * 	insert an entry (key-value pair) with key `k` and value `v` into the BST.
 	 */
 	public void insert(BSTNode<E> n, int k, E v) {
+		BSTNode<E> result = search(n, k);
+		if (result.isExternal()){
+			
+			result.setKey(k);
+			result.setValue(v);
+			
+			BSTNode<E> LExNode = new BSTNode<E>();
+			BSTNode<E> RExNode = new BSTNode<E>();
+			
+			result.setLeft(LExNode);
+			result.setRight(RExNode);
+			LExNode.setParent(result);
+			RExNode.setParent(result);
+		}
 		
+		else {
+			
+			result.setValue(v);
+		}
 	}
 	
 	/*
@@ -53,5 +71,121 @@ public class BSTUtilities<E> {
 	 */
 	public void delete(BSTNode<E> n, int k) {
 		
+		BSTNode<E> result = search(n, k);
+		
+
+		
+		
+		//key is not in our BST
+		if (result.isExternal()) {
+			//do nothing
+		}
+		
+		//results children are both external nodes
+		else if (result.getLeft().isExternal() && result.getRight().isExternal() ){
+			
+			result.setLeft(null);
+			result.setRight(null);
+			
+			result.setValue(null);
+			result.setKey(-1);
+	
+		}
+		//if only one of the children is external, didn't code for it explicitily since above case should catch it, but keep it in mind
+		else if (result.getLeft().isExternal()){
+			BSTNode<E> resultParent = result.getParent();
+			
+			if(resultParent==null) {
+				result.setKey(result.getRight().getKey());
+				result.setValue(result.getRight().getValue());
+				
+				result.setLeft(result.getRight().getLeft());
+				result.setRight(result.getRight().getRight());
+			}
+			
+			else if (resultParent.getLeft()==result) {
+				resultParent.setLeft(result.getRight());
+				result.getRight().setParent(resultParent);
+				
+			}
+			
+			else {
+				resultParent.setRight(result.getRight());
+				result.getRight().setParent(resultParent);
+			}
+			
+		}
+		
+		
+		else if (result.getRight().isExternal()) {
+			BSTNode<E> resultParent = result.getParent();
+			
+			if(resultParent==null) {
+				result.setKey(result.getLeft().getKey());
+				result.setValue(result.getLeft().getValue());
+				
+				result.setRight(result.getLeft().getRight());
+				result.setLeft(result.getLeft().getLeft());
+			}
+			
+			else if (resultParent.getLeft()==result) {
+				resultParent.setLeft(result.getLeft());
+				result.getLeft().setParent(resultParent);
+				
+			}
+			
+			else {
+				resultParent.setRight(result.getLeft());
+				result.getLeft().setParent(resultParent);
+			}
+		}
+		
+		//final case, the removed node has two child internal nodes
+		
+		else {
+			//find rightmost Node in LT
+			BSTNode<E> current = result.getLeft();
+			while(current.getRight().isInternal()) {
+				current = current.getRight();
+			}
+			
+			result.setKey(current.getKey());
+			result.setValue(current.getValue());
+			
+			
+			//remove current
+			
+			if (current.getLeft().isExternal()){
+				
+				current.setLeft(null);
+				current.setRight(null);
+				
+				current.setValue(null);
+				current.setKey(-1);
+		
+			}
+			
+			else {
+				BSTNode<E> currentParent = current.getParent();
+				
+				
+				
+				if (current == currentParent.getLeft()) {
+					currentParent.setLeft(current.getLeft());
+					current.getLeft().setParent(currentParent);
+				}
+				
+				else {
+					currentParent.setRight(current.getLeft());
+					current.getLeft().setParent(currentParent);
+				}
+				
+			}
+		
+		
+		
+		
+		}
 	}
-}
+	
+}	
