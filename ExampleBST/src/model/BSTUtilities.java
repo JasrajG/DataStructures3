@@ -22,6 +22,38 @@ public class BSTUtilities<E> {
 		return result;
 	}
 	
+	public boolean check(BSTNode<E> root) {
+		
+		if (root.isExternal()) {
+			return true;
+		}
+		return checkHelper1(root.getLeft(), root.getKey()) && checkHelper2(root.getRight(), root.getKey()) && check(root.getLeft()) && check(root.getRight());
+	}
+	
+	
+	private boolean checkHelper1(BSTNode<E> child, int n) {
+		
+		if (child.isExternal()) {
+			return true;
+		}
+		
+		else {
+			return child.getKey()<n && checkHelper1(child.getLeft(),n) && checkHelper1(child.getRight(),n);
+		}
+	}
+	
+	private boolean checkHelper2(BSTNode<E> child, int n) {
+		
+		if (child.isExternal()) {
+			return true;
+		}
+		
+		else {
+			return child.getKey()>n && checkHelper2(child.getLeft(),n) && checkHelper2(child.getRight(),n);
+		}
+	}
+	
+	
 	public BSTNode<E> search(BSTNode<E> p, int k) {
 		BSTNode<E> result = null;
 		if(p.isExternal()) {

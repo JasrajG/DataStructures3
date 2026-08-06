@@ -383,4 +383,111 @@ public class TestBST {
 			// Because the tree is empty (root is external), traversal should return null based on your traversal code
 			assertNull(u.inOrderTraversal(root));
 		}
+		
+		
+		// ==========================================
+		// TESTS FOR check() METHOD
+		// ==========================================
+
+		@Test
+		public void test_check_empty_tree() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			// An empty tree is just a single external node
+			BSTNode<String> root = new BSTNode<>();
+			
+			assertTrue("An empty tree should be considered a valid BST", u.check(root));
+		}
+
+		@Test
+		public void test_check_valid_bst() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			// Using your existing helper method to create a valid tree
+			BSTNode<String> root = createStandardTree(u);
+			
+			assertTrue("A properly constructed BST should return true", u.check(root));
+		}
+
+		@Test
+		public void test_check_invalid_immediate_left_child() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			
+			// Manually build an invalid tree to bypass the insert() method
+			BSTNode<String> root = new BSTNode<>(50, "root");
+			BSTNode<String> left = new BSTNode<>(60, "invalid_left"); // Invalid: 60 > 50
+			BSTNode<String> right = new BSTNode<>(70, "valid_right");
+			
+			// Link the nodes
+			root.setLeft(left); 
+			root.setRight(right);
+			
+			// Cap them off with external nodes so they are recognized as internal nodes
+			left.setLeft(new BSTNode<>()); left.setRight(new BSTNode<>());
+			right.setLeft(new BSTNode<>()); right.setRight(new BSTNode<>());
+			
+			assertFalse("Tree is invalid because left child (60) > root (50)", u.check(root));
+		}
+
+		@Test
+		public void test_check_invalid_immediate_right_child() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			
+			BSTNode<String> root = new BSTNode<>(50, "root");
+			BSTNode<String> left = new BSTNode<>(30, "valid_left");
+			BSTNode<String> right = new BSTNode<>(40, "invalid_right"); // Invalid: 40 < 50
+			
+			root.setLeft(left); 
+			root.setRight(right);
+			
+			left.setLeft(new BSTNode<>()); left.setRight(new BSTNode<>());
+			right.setLeft(new BSTNode<>()); right.setRight(new BSTNode<>());
+			
+			assertFalse("Tree is invalid because right child (40) < root (50)", u.check(root));
+		}
+
+		@Test
+		public void test_check_invalid_deep_subtree_violation() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			
+			BSTNode<String> root = new BSTNode<>(50, "root");
+			BSTNode<String> left = new BSTNode<>(30, "left");
+			BSTNode<String> right = new BSTNode<>(70, "right");
+			
+			// This node is perfectly valid relative to its immediate parent (30) 
+			// because 60 > 30. HOWEVER, it is invalid relative to the root (50) 
+			// because 60 > 50, and it is situated in the left subtree.
+			// This specifically tests if your checkHelper1 works recursively!
+			BSTNode<String> deepInvalidNode = new BSTNode<>(60, "deep_invalid");
+			
+			root.setLeft(left);
+			root.setRight(right);
+			
+			left.setLeft(new BSTNode<>());
+			left.setRight(deepInvalidNode);
+			
+			right.setLeft(new BSTNode<>());
+			right.setRight(new BSTNode<>());
+			
+			deepInvalidNode.setLeft(new BSTNode<>());
+			deepInvalidNode.setRight(new BSTNode<>());
+			
+			assertFalse("Tree is invalid because a node in the left subtree (60) is > root (50)", u.check(root));
+		}
+
+		@Test
+		public void test_check_duplicate_keys() {
+			BSTUtilities<String> u = new BSTUtilities<>();
+			
+			BSTNode<String> root = new BSTNode<>(50, "root");
+			BSTNode<String> left = new BSTNode<>(50, "duplicate"); // Duplicate key
+			
+			root.setLeft(left);
+			root.setRight(new BSTNode<>());
+			
+			left.setLeft(new BSTNode<>());
+			left.setRight(new BSTNode<>());
+			
+			// Because your checkHelper1 looks for child.getKey() < n (strict inequality), 
+			// this should properly return false.
+			assertFalse("Tree should be invalid if it contains duplicate keys", u.check(root));
+		}
 }
